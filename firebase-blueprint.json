@@ -1,0 +1,39 @@
+{
+  "entities": {
+    "Student": {
+      "title": "Student",
+      "description": "A student registered in the system.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Full name of the student" },
+        "studentId": { "type": "string", "description": "Unique student identifier" },
+        "photoUrl": { "type": "string", "description": "URL to the student's reference photo" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "When the student was registered" }
+      },
+      "required": ["name", "studentId", "photoUrl"]
+    },
+    "AttendanceRecord": {
+      "title": "Attendance Record",
+      "description": "A log of a student's attendance for a specific day.",
+      "type": "object",
+      "properties": {
+        "studentId": { "type": "string", "description": "ID of the student" },
+        "name": { "type": "string", "description": "Name of the student" },
+        "date": { "type": "string", "description": "Date in YYYY-MM-DD format" },
+        "timestamp": { "type": "string", "format": "date-time", "description": "Exact time of check-in" },
+        "status": { "type": "string", "enum": ["Present", "Late"], "description": "Attendance status" }
+      },
+      "required": ["studentId", "name", "date", "timestamp", "status"]
+    }
+  },
+  "firestore": {
+    "/students/{studentId}": {
+      "schema": "Student",
+      "description": "Collection of registered students"
+    },
+    "/attendance/{recordId}": {
+      "schema": "AttendanceRecord",
+      "description": "Collection of attendance logs"
+    }
+  }
+}

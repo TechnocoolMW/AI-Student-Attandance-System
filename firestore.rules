@@ -1,0 +1,61 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: students
+    // Fields:
+    //   - name: string (required)
+    //   - studentId: string (required)
+    //   - photoUrl: string (required)
+    //   - createdAt: timestamp (required)
+    //
+    // Collection: attendance
+    // Fields:
+    //   - studentId: string (required)
+    //   - name: string (required)
+    //   - date: string (required, YYYY-MM-DD)
+    //   - timestamp: timestamp (required)
+    //   - status: string (required, enum: ['Present', 'Late'])
+    //
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && 
+        (request.auth.token.email == "kevinbinali97@gmail.com" && request.auth.token.email_verified == true);
+    }
+
+    function isValidStudent(data) {
+      return data.keys().hasAll(['name', 'studentId', 'photoUrl', 'createdAt']) &&
+             data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+             data.studentId is string && data.studentId.size() > 0 &&
+             data.photoUrl is string && data.photoUrl.size() > 0;
+    }
+
+    function isValidAttendance(data) {
+      return data.keys().hasAll(['studentId', 'name', 'date', 'timestamp', 'status']) &&
+             data.studentId is string &&
+             data.name is string &&
+             data.date is string && data.date.matches("^\\d{4}-\\d{2}-\\d{2}$") &&
+             data.status in ['Present', 'Late'];
+    }
+
+    match /students/{studentId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    match /attendance/{recordId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && isValidAttendance(request.resource.data);
+      allow update, delete: if isAdmin();
+    }
+  }
+}

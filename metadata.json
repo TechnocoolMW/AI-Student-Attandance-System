@@ -1,0 +1,5 @@
+{
+  "name": "AI Student Attendance System",
+  "description": "A modern AI-powered attendance system using face recognition to automate student check-ins and provide real-time dashboards.",
+  "requestFramePermissions": ["camera"]
+}
